@@ -75,7 +75,7 @@ func main() {
 	// 	panic(err1)
 	// }
 	fmt.Println("")
-	fmt.Printf("[*] Your Bootstrap ID Is: /ip4/%s/tcp/%v/ipfs/%s\n", *listenHost, *port, host.ID().Pretty())
+	logger.Info("Your Bootstrap Address is: ", host.Addrs())
 	fmt.Println("")
 	select {}
 }
