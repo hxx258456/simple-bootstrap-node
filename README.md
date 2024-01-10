@@ -23,3 +23,9 @@ example output:
 1. Copy the bootstrap id to your bootstrap nodes list and enjoy.
 
 ### Notice: for a test example with kad-dht, visit [go-libp2p-examples](https://github.com/libp2p/go-libp2p-examples/blob/master/chat-with-rendezvous/chat.go)
+
+
+### 交叉编译
+```bash
+CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o ./bin/bootstrap main.go
+```

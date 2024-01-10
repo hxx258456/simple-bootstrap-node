@@ -17,3 +17,4 @@ build/
 vendor/
 .vscode/
 release/
+bin/

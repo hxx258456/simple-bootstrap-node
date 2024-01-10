@@ -10,8 +10,8 @@ import (
 
 	"github.com/ipfs/go-log/v2"
 	"github.com/libp2p/go-libp2p"
+	"github.com/libp2p/go-libp2p-core/crypto"
 	dht "github.com/libp2p/go-libp2p-kad-dht"
-	"github.com/libp2p/go-libp2p/core/crypto"
 	"github.com/multiformats/go-multiaddr"
 )
 
@@ -54,7 +54,6 @@ func main() {
 		libp2p.Identity(prvKey),
 		libp2p.NoSecurity,
 	}
-
 	host, err := libp2p.New(
 		opts...)
 
