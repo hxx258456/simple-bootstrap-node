@@ -29,3 +29,13 @@ example output:
 ```bash
 CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o ./bin/bootstrap main.go
 ```
+
+### Using Docker
+镜像构建
+```bash
+docker build -t bootstrap:latest .
+```
+运行容器
+```bash
+docker run --net host -v ./conf:/data/bootstrap/conf --name bootstrap --restart always -itd bootstrap bootstrap -port 4001
+```

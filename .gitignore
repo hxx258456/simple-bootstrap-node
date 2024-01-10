@@ -18,3 +18,5 @@ vendor/
 .vscode/
 release/
 bin/
+config.yaml
+/conf

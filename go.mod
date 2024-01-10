@@ -1,4 +1,4 @@
-module github.com/hxx258456/simple-bootstrap-node
+module bootstrap-node
 
 go 1.18
 

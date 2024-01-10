@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"path"
 
 	"github.com/ipfs/go-log/v2"
 	"github.com/libp2p/go-libp2p"
@@ -15,6 +16,8 @@ import (
 )
 
 var logger = log.Logger("bootsrap")
+
+const CfgDir = "/data/bootstrap/conf"
 
 var prvKey string
 
@@ -93,14 +96,15 @@ func main() {
 }
 
 func init() {
-	if _, err := os.Stat("config.yaml"); err != nil {
-		if _, err := os.Create("config.yaml"); err != nil {
+	cfgPath := path.Join(CfgDir, "config.yaml")
+	if _, err := os.Stat(cfgPath); err != nil {
+		if _, err := os.Create(cfgPath); err != nil {
 			panic(err)
 		}
 	}
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
-	viper.AddConfigPath(".")
+	viper.AddConfigPath(CfgDir)
 
 	if err := viper.ReadInConfig(); err != nil {
 		panic(err)
