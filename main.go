@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"os"
 
-	mrand "math/rand"
-
 	"github.com/ipfs/go-log/v2"
 	"github.com/libp2p/go-libp2p"
 	"github.com/libp2p/go-libp2p-core/crypto"
@@ -16,6 +14,9 @@ import (
 )
 
 var logger = log.Logger("bootsrap")
+
+// var
+var prvKey string
 
 func main() {
 	log.SetAllLoggers(log.LevelInfo)
@@ -36,10 +37,27 @@ func main() {
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	r := mrand.New(mrand.NewSource(int64(*port)))
 
-	// Creates a new RSA key pair for this host.
-	prvKey, _, err := crypto.GenerateKeyPairWithReader(crypto.RSA, 2048, r)
+	if prvKey == "" {
+		logger.Info("No private key provided. Generating a new one...")
+		// Creates a new RSA key pair for this host.
+		host, err := libp2p.New()
+
+		if err != nil {
+			panic(err)
+		}
+		//节点私钥
+		keyBytes, err := crypto.MarshalPrivateKey(host.Peerstore().PrivKey(host.ID()))
+		if err != nil {
+			panic(err)
+		}
+
+		prvKey = string(keyBytes)
+		WriteConfig()
+	}
+
+	// Unmarshal Private Key
+	privateKey, err := crypto.UnmarshalPrivateKey([]byte(prvKey))
 	if err != nil {
 		panic(err)
 	}
@@ -51,7 +69,7 @@ func main() {
 	// Other options can be added here.
 	opts := []libp2p.Option{
 		libp2p.ListenAddrs(sourceMultiAddr),
-		libp2p.Identity(prvKey),
+		libp2p.Identity(privateKey),
 		// libp2p.NoSecurity,
 	}
 	host, err := libp2p.New(
