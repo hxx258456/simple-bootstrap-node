@@ -52,7 +52,7 @@ func main() {
 	opts := []libp2p.Option{
 		libp2p.ListenAddrs(sourceMultiAddr),
 		libp2p.Identity(prvKey),
-		libp2p.NoSecurity,
+		// libp2p.NoSecurity,
 	}
 	host, err := libp2p.New(
 		opts...)
