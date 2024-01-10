@@ -11,17 +11,18 @@ import (
 	"github.com/libp2p/go-libp2p-core/crypto"
 	dht "github.com/libp2p/go-libp2p-kad-dht"
 	"github.com/multiformats/go-multiaddr"
+	"github.com/spf13/viper"
 )
 
 var logger = log.Logger("bootsrap")
 
-// var
 var prvKey string
 
 func main() {
 	log.SetAllLoggers(log.LevelInfo)
 	log.SetLogLevel("bootsrap", "info")
 	help := flag.Bool("help", false, "Display Help")
+
 	listenHost := flag.String("host", "0.0.0.0", "The bootstrap node host listen address\n")
 	port := flag.Int("port", 4001, "The bootstrap node listen port")
 	flag.Parse()
@@ -41,19 +42,18 @@ func main() {
 	if prvKey == "" {
 		logger.Info("No private key provided. Generating a new one...")
 		// Creates a new RSA key pair for this host.
-		host, err := libp2p.New()
-
+		h, err := libp2p.New()
 		if err != nil {
 			panic(err)
 		}
 		//节点私钥
-		keyBytes, err := crypto.MarshalPrivateKey(host.Peerstore().PrivKey(host.ID()))
+		keyBytes, err := crypto.MarshalPrivateKey(h.Peerstore().PrivKey(h.ID()))
 		if err != nil {
 			panic(err)
 		}
 
 		prvKey = string(keyBytes)
-		WriteConfig()
+		writeConfig()
 	}
 
 	// Unmarshal Private Key
@@ -70,7 +70,6 @@ func main() {
 	opts := []libp2p.Option{
 		libp2p.ListenAddrs(sourceMultiAddr),
 		libp2p.Identity(privateKey),
-		// libp2p.NoSecurity,
 	}
 	host, err := libp2p.New(
 		opts...)
@@ -81,19 +80,38 @@ func main() {
 	logger.Info("Host created. We are:", host.ID())
 	logger.Info(host.Addrs())
 
-	// dht.ProtocolPrefix("primihub")
 	_, err = dht.New(ctx, host,
 		dht.Mode(dht.ModeServer))
-	// dht.ProtocolPrefix("primihub"))
 	if err != nil {
 		panic(err)
 	}
-	// err1 := kad.Bootstrap(ctx)
-	// if err1 != nil {
-	// 	panic(err1)
-	// }
+
 	fmt.Println("")
 	logger.Info("Your Bootstrap Address is: ", host.Addrs())
 	fmt.Println("")
 	select {}
+}
+
+func init() {
+	if _, err := os.Stat("config.yaml"); err != nil {
+		if _, err := os.Create("config.yaml"); err != nil {
+			panic(err)
+		}
+	}
+	viper.SetConfigName("config")
+	viper.SetConfigType("yaml")
+	viper.AddConfigPath(".")
+
+	if err := viper.ReadInConfig(); err != nil {
+		panic(err)
+	}
+
+	prvKey = viper.GetString("private_key")
+}
+
+func writeConfig() {
+	viper.Set("private_key", prvKey)
+	if err := viper.WriteConfig(); err != nil {
+		panic(err)
+	}
 }
